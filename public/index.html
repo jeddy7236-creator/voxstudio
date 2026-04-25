@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VoxStudio — Ultimate Creator Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #080b10;
+  --surface:  #0e1219;
+  --card:     #131820;
+  --border:   #1e2633;
+  --accent:   #7c3aed;
+  --accent2:  #06b6d4;
+  --accent3:  #f59e0b;
+  --green:    #10b981;
+  --red:      #ef4444;
+  --text:     #e8edf5;
+  --muted:    #6b7a96;
+  --glow:     rgba(124,58,237,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:15px;
+  min-height:100vh;overflow-x:hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px}
+
+/* ── Auth Screen ── */
+#authScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,58,237,.18) 0%, transparent 70%),var(--bg);
+  padding:20px;
+}
+.auth-box{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px;padding:40px 36px;width:100%;max-width:420px;
+  box-shadow:0 0 60px rgba(124,58,237,.1);
+}
+.auth-logo{
+  text-align:center;margin-bottom:32px;
+}
+.auth-logo h1{
+  font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;
+  background:linear-gradient(135deg,#a78bfa,#06b6d4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-1px;
+}
+.auth-logo p{color:var(--muted);font-size:.85rem;margin-top:4px}
+.auth-tabs{display:flex;gap:8px;margin-bottom:28px;background:var(--surface);border-radius:12px;padding:4px}
+.auth-tab{
+  flex:1;padding:10px;border:none;background:none;color:var(--muted);
+  border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.9rem;
+  transition:.2s;
+}
+.auth-tab.active{background:var(--accent);color:#fff;font-weight:500}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.field input{
+  width:100%;padding:13px 16px;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.95rem;transition:.2s;outline:none;
+}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.btn{
+  width:100%;padding:14px;background:var(--accent);color:#fff;border:none;
+  border-radius:12px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:.2s;letter-spacing:.3px;
+}
+.btn:hover{background:#6d28d9;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--surface);border-color:var(--accent)}
+.btn-sm{width:auto;padding:8px 16px;font-size:.85rem;border-radius:9px}
+.btn-red{background:var(--red)}
+.btn-red:hover{background:#dc2626}
+.btn-green{background:var(--green)}
+.btn-green:hover{background:#059669}
+.btn-cyan{background:var(--accent2);color:#000}
+.btn-cyan:hover{background:#0891b2}
+.msg{padding:12px 16px;border-radius:10px;font-size:.85rem;margin-top:12px;display:none}
+.msg.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.msg.success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+
+/* ── App Shell ── */
+#app{display:none;min-height:100vh}
+
+/* ── Sidebar ── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:230px;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:100;
+  transition:transform .3s;
+}
+.sidebar-logo{
+  padding:24px 20px 20px;border-bottom:1px solid var(--border);
+}
+.sidebar-logo h2{
+  font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;
+  background:linear-gradient(135deg,#a78bfa,#06b6d4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.sidebar-logo span{font-size:.7rem;color:var(--muted);display:block;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{font-size:.65rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1px;padding:8px 8px 4px;margin-top:8px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;
+  border-radius:10px;cursor:pointer;color:var(--muted);font-size:.9rem;
+  transition:.15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{background:var(--border);color:var(--text)}
+.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(6,182,212,.1));
+  color:var(--text);border:1px solid rgba(124,58,237,.2)}
+.nav-item .icon{font-size:1.1rem;width:22px;text-align:center}
+.nav-item .badge{margin-left:auto;background:var(--accent);color:#fff;
+  font-size:.65rem;padding:2px 7px;border-radius:20px}
+.sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
+.user-chip{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  background:var(--card);border-radius:12px;cursor:pointer;
+}
+.avatar{width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;flex-shrink:0}
+.user-info .name{font-size:.85rem;font-weight:500}
+.user-info .plan{font-size:.7rem;color:var(--accent2)}
+
+/* ── Mobile Header ── */
+.mobile-header{
+  display:none;position:fixed;top:0;left:0;right:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 16px;z-index:99;
+  align-items:center;justify-content:space-between;
+}
+.hamburger{font-size:1.3rem;cursor:pointer;background:none;border:none;color:var(--text)}
+.mobile-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+  background:linear-gradient(135deg,#a78bfa,#06b6d4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99}
+
+/* ── Main Content ── */
+.main{margin-left:230px;min-height:100vh;padding:28px;transition:margin .3s}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:28px}
+.page-header h1{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800}
+.page-header p{color:var(--muted);font-size:.9rem;margin-top:4px}
+
+/* ── Stats Grid ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:20px;position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;right:0;width:80px;height:80px;
+  border-radius:50%;filter:blur(30px);opacity:.5;
+}
+.stat-card.purple::before{background:var(--accent)}
+.stat-card.cyan::before{background:var(--accent2)}
+.stat-card.amber::before{background:var(--accent3)}
+.stat-card.green::before{background:var(--green)}
+.stat-icon{font-size:1.4rem;margin-bottom:10px}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;line-height:1}
+.stat-label{font-size:.75rem;color:var(--muted);margin-top:4px}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-header h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
+.section-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+
+/* ── Media Items ── */
+.media-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;transition:.2s;
+}
+.media-item:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.media-thumb{
+  width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+}
+.media-thumb img{width:100%;height:100%;object-fit:cover}
+.media-info{padding:12px}
+.media-info h4{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.media-info p{font-size:.75rem;color:var(--muted);margin-top:2px}
+.media-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+
+/* ── Script Cards ── */
+.script-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:18px;transition:.2s;margin-bottom:12px;
+}
+.script-card:hover{border-color:var(--accent)}
+.script-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tag{
+  font-size:.7rem;padding:3px 9px;border-radius:20px;font-weight:500;
+}
+.tag-purple{background:rgba(124,58,237,.2);color:#a78bfa}
+.tag-cyan{background:rgba(6,182,212,.2);color:#67e8f9}
+.tag-amber{background:rgba(245,158,11,.2);color:#fbbf24}
+.tag-green{background:rgba(16,185,129,.2);color:#6ee7b7}
+.script-content{
+  font-size:.82rem;color:var(--muted);line-height:1.6;
+  white-space:pre-wrap;max-height:120px;overflow:hidden;
+  position:relative;
+}
+.script-content::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:linear-gradient(transparent,var(--surface));
+}
+.script-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+
+/* ── Upload Zone ── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:16px;
+  padding:40px 20px;text-align:center;cursor:pointer;
+  transition:.2s;background:var(--surface);
+}
+.upload-zone:hover,.upload-zone.dragover{
+  border-color:var(--accent);background:rgba(124,58,237,.05);
+}
+.upload-icon{font-size:2.5rem;margin-bottom:12px}
+.upload-zone h3{font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:6px}
+.upload-zone p{font-size:.8rem;color:var(--muted)}
+.upload-zone input[type=file]{display:none}
+.progress-bar{height:4px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:12px;display:none}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s;width:0%}
+
+/* ── Script Generator ── */
+.gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gen-options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.option-btn{
+  padding:8px 14px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);cursor:pointer;font-size:.82rem;
+  transition:.15s;
+}
+.option-btn:hover,.option-btn.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+.result-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:20px;white-space:pre-wrap;
+  font-size:.83rem;line-height:1.7;max-height:400px;overflow-y:auto;
+  color:var(--text);
+}
+.hooks-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.hook-item{
+  padding:10px 14px;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;font-size:.82rem;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hook-item:hover{border-color:var(--accent);background:rgba(124,58,237,.05)}
+
+/* ── Hashtag Tool ── */
+.hashtag-result{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:20px;font-size:.9rem;line-height:1.8;
+  color:var(--accent2);word-break:break-word;
+}
+
+/* ── Activity Feed ── */
+.activity-item{
+  display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.activity-item:last-child{border:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.activity-text{font-size:.83rem}
+.activity-time{font-size:.75rem;color:var(--muted);margin-left:auto;flex-shrink:0}
+
+/* ── Search & Filter Bar ── */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.search-input{
+  flex:1;min-width:200px;padding:10px 16px;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:.2s;
+}
+.search-input:focus{border-color:var(--accent)}
+.select-input{
+  padding:10px 14px;background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.85rem;outline:none;cursor:pointer;
+}
+
+/* ── Empty State ── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .icon{font-size:3rem;margin-bottom:12px}
+.empty h3{font-family:'Syne',sans-serif;color:var(--text);margin-bottom:6px}
+.empty p{font-size:.85rem}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:14px 18px;font-size:.85rem;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateY(80px);
+  opacity:0;transition:.3s;max-width:320px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--green);color:#6ee7b7}
+.toast.error{border-color:var(--red);color:#fca5a5}
+
+/* ── Loading Spinner ── */
+.spinner{display:inline-block;width:18px;height:18px;
+  border:2px solid rgba(255,255,255,.2);border-top-color:#fff;
+  border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:28px;width:100%;max-width:500px;
+  max-height:90vh;overflow-y:auto;
+}
+.modal h2{font-family:'Syne',sans-serif;font-size:1.2rem;margin-bottom:20px}
+.modal-close{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.3rem}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .mobile-header{display:flex}
+  .main{margin-left:0;padding:16px;padding-top:70px}
+  .gen-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .section-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+@media(max-width:400px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .auth-box{padding:28px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ AUTH SCREEN ═══ -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h1>🎙️ VoxStudio</h1>
+      <p>Your ultimate creator platform</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchAuth('signup')">Sign Up</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"/></div>
+      <button class="btn" onclick="login()">Sign In</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupForm" style="display:none">
+      <div class="field"><label>Username</label><input type="text" id="signupUser" placeholder="yourcoolname"/></div>
+      <div class="field"><label>Display Name</label><input type="text" id="signupDisplay" placeholder="Your Name"/></div>
+      <div class="field"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="signupPass" placeholder="Min 8 characters"/></div>
+      <button class="btn" onclick="signup()">Create Account</button>
+      <div class="msg" id="signupMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <!-- Mobile Header -->
+  <div class="mobile-header">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <span class="mobile-logo">🎙️ VoxStudio</span>
+    <button class="btn btn-sm btn-outline" onclick="logout()" style="width:auto;padding:6px 12px;font-size:.8rem">Out</button>
+  </div>
+
+  <!-- Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h2>🎙️ VoxStudio</h2>
+      <span>Ultimate Creator Suite</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <button class="nav-item active" onclick="nav('dashboard')"><span class="icon">📊</span>Dashboard</button>
+
+      <div class="nav-section">Content</div>
+      <button class="nav-item" onclick="nav('videos')"><span class="icon">🎬</span>Videos</button>
+      <button class="nav-item" onclick="nav('images')"><span class="icon">🖼️</span>Images</button>
+      <button class="nav-item" onclick="nav('audio')"><span class="icon">🎵</span>Audio</button>
+
+      <div class="nav-section">Create</div>
+      <button class="nav-item" onclick="nav('scripts')"><span class="icon">✍️</span>Script Generator</button>
+      <button class="nav-item" onclick="nav('hashtags')"><span class="icon">#️⃣</span>Hashtag Tool</button>
+
+      <div class="nav-section">Account</div>
+      <button class="nav-item" onclick="nav('profile')"><span class="icon">👤</span>Profile</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-chip" onclick="nav('profile')">
+        <div class="avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="name" id="sidebarName">Loading...</div>
+          <div class="plan" id="sidebarPlan">free plan</div>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="width:100%;margin-top:10px;font-size:.8rem">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ── Dashboard ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1>👋 Welcome back, <span id="dashName">Creator</span></h1>
+        <p>Here's what's happening with your content today</p>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card purple"><div class="stat-icon">🎬</div><div class="stat-val" id="statVideos">0</div><div class="stat-label">Videos</div></div>
+        <div class="stat-card cyan"><div class="stat-icon">🖼️</div><div class="stat-val" id="statImages">0</div><div class="stat-label">Images</div></div>
+        <div class="stat-card amber"><div class="stat-icon">✍️</div><div class="stat-val" id="statScripts">0</div><div class="stat-label">Scripts</div></div>
+        <div class="stat-card green"><div class="stat-icon">🎵</div><div class="stat-val" id="statAudio">0</div><div class="stat-label">Audio Files</div></div>
+        <div class="stat-card purple"><div class="stat-icon">👁️</div><div class="stat-val" id="statViews">0</div><div class="stat-label">Total Views</div></div>
+        <div class="stat-card amber"><div class="stat-icon">💾</div><div class="stat-val" id="statStorage">0</div><div class="stat-label">MB Used</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Videos</h3>
+            <button class="btn btn-sm btn-outline" onclick="nav('videos')">View All</button>
+          </div>
+          <div id="recentVideos"><div class="empty"><div class="icon">🎬</div><p>No videos yet</p></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Scripts</h3>
+            <button class="btn btn-sm btn-outline" onclick="nav('scripts')">View All</button>
+          </div>
+          <div id="recentScripts"><div class="empty"><div class="icon">✍️</div><p>No scripts yet</p></div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header"><h3>Activity Feed</h3></div>
+        <div id="activityFeed"><div class="empty"><div class="icon">⚡</div><p>No activity yet</p></div></div>
+      </div>
+    </div>
+
+    <!-- ── Videos ── -->
+    <div class="page" id="page-videos">
+      <div class="page-header">
+        <h1>🎬 Videos</h1>
+        <p>Upload and manage your video content</p>
+      </div>
+
+      <div class="card">
+        <label class="upload-zone" id="videoUploadZone">
+          <input type="file" id="videoFileInput" accept="video/*" onchange="uploadVideo(this)"/>
+          <div class="upload-icon">🎬</div>
+          <h3>Drop your video here</h3>
+          <p>MP4, MOV, AVI, WebM — up to 500MB</p>
+          <div class="progress-bar" id="videoProgress"><div class="progress-fill" id="videoProgressFill"></div></div>
+        </label>
+      </div>
+
+      <div class="filter-bar">
+        <input class="search-input" placeholder="🔍 Search videos..." oninput="filterVideos(this.value)"/>
+        <button class="btn btn-sm btn-outline" onclick="loadVideos()">↻ Refresh</button>
+      </div>
+
+      <div class="section-grid" id="videosGrid">
+        <div class="empty"><div class="icon">🎬</div><h3>No videos yet</h3><p>Upload your first video above</p></div>
+      </div>
+    </div>
+
+    <!-- ── Images ── -->
+    <div class="page" id="page-images">
+      <div class="page-header">
+        <h1>🖼️ Images</h1>
+        <p>Upload and manage your image content</p>
+      </div>
+
+      <div class="card">
+        <label class="upload-zone" id="imageUploadZone">
+          <input type="file" id="imageFileInput" accept="image/*" onchange="uploadImage(this)"/>
+          <div class="upload-icon">🖼️</div>
+          <h3>Drop your image here</h3>
+          <p>JPEG, PNG, WebP, GIF — up to 50MB</p>
+          <div class="progress-bar" id="imageProgress"><div class="progress-fill" id="imageProgressFill"></div></div>
+        </label>
+      </div>
+
+      <div class="filter-bar">
+        <button class="btn btn-sm btn-outline" onclick="loadImages()">↻ Refresh</button>
+      </div>
+
+      <div class="section-grid" id="imagesGrid">
+        <div class="empty"><div class="icon">🖼️</div><h3>No images yet</h3><p>Upload your first image above</p></div>
+      </div>
+    </div>
+
+    <!-- ── Audio ── -->
+    <div class="page" id="page-audio">
+      <div class="page-header">
+        <h1>🎵 Audio</h1>
+        <p>Upload and manage your audio files</p>
+      </div>
+
+      <div class="card">
+        <label class="upload-zone">
+          <input type="file" id="audioFileInput" accept="audio/*" onchange="uploadAudio(this)"/>
+          <div class="upload-icon">🎵</div>
+          <h3>Drop your audio here</h3>
+          <p>MP3, WAV, OGG, AAC — up to 100MB</p>
+        </label>
+      </div>
+
+      <button class="btn btn-sm btn-outline" onclick="loadAudio()" style="margin-bottom:16px">↻ Refresh</button>
+
+      <div id="audioList">
+        <div class="empty"><div class="icon">🎵</div><h3>No audio yet</h3><p>Upload your first audio above</p></div>
+      </div>
+    </div>
+
+    <!-- ── Scripts ── -->
+    <div class="page" id="page-scripts">
+      <div class="page-header">
+        <h1>✍️ Script Generator</h1>
+        <p>Generate viral scripts for any platform in seconds</p>
+      </div>
+
+      <div class="gen-grid">
+        <!-- Generator -->
+        <div>
+          <div class="card">
+            <div class="field">
+              <label>Topic / Niche</label>
+              <input type="text" id="scriptTopic" placeholder="e.g. fitness, crypto, cooking..." style="width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none"/>
+            </div>
+
+            <label style="font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Platform</label>
+            <div class="gen-options" id="platformOptions">
+              <button class="option-btn selected" data-val="tiktok" onclick="selectOption(this,'platform')">TikTok</button>
+              <button class="option-btn" data-val="instagram" onclick="selectOption(this,'platform')">Instagram</button>
+              <button class="option-btn" data-val="youtube" onclick="selectOption(this,'platform')">YouTube</button>
+              <button class="option-btn" data-val="twitter" onclick="selectOption(this,'platform')">Twitter</button>
+              <button class="option-btn" data-val="linkedin" onclick="selectOption(this,'platform')">LinkedIn</button>
+            </div>
+
+            <label style="font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px;margin-top:12px">Tone / Style</label>
+            <div class="gen-options" id="toneOptions">
+              <button class="option-btn selected" data-val="motivation" onclick="selectOption(this,'tone')">🔥 Motivation</button>
+              <button class="option-btn" data-val="business" onclick="selectOption(this,'tone')">💼 Business</button>
+              <button class="option-btn" data-val="educational" onclick="selectOption(this,'tone')">📚 Educational</button>
+              <button class="option-btn" data-val="funny" onclick="selectOption(this,'tone')">😂 Funny</button>
+              <button class="option-btn" data-val="storytelling" onclick="selectOption(this,'tone')">🎬 Story</button>
+              <button class="option-btn" data-val="viral" onclick="selectOption(this,'tone')">⚡ Viral</button>
+            </div>
+
+            <button class="btn" onclick="generateScript()" style="margin-top:16px" id="genBtn">✨ Generate Script</button>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div>
+          <div class="card" id="scriptResult" style="display:none">
+            <div class="card-header">
+              <h3>Generated Script</h3>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-sm btn-green" onclick="copyScript()">📋 Copy</button>
+                <button class="btn btn-sm btn-outline" onclick="generateScript()">↻ Regenerate</button>
+              </div>
+            </div>
+            <div class="result-box" id="scriptOutput"></div>
+
+            <div style="margin-top:16px">
+              <p style="font-size:.8rem;color:var(--muted);margin-bottom:8px">SUGGESTED HOOKS</p>
+              <div class="hooks-list" id="hooksOutput"></div>
+            </div>
+
+            <div style="margin-top:16px;padding:14px;background:var(--bg);border-radius:12px">
+              <p style="font-size:.75rem;color:var(--muted);margin-bottom:6px">HASHTAGS</p>
+              <p style="font-size:.82rem;color:var(--accent2);line-height:1.8" id="hashtagOutput"></p>
+            </div>
+
+            <div style="margin-top:12px;padding:12px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:10px">
+              <p style="font-size:.78rem;color:#6ee7b7" id="ctaOutput"></p>
+            </div>
+          </div>
+
+          <div class="card" id="scriptPlaceholder">
+            <div class="empty">
+              <div class="icon">✨</div>
+              <h3>Ready to generate</h3>
+              <p>Fill in the topic and hit Generate</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved Scripts -->
+      <div style="margin-top:28px">
+        <div class="card-header" style="margin-bottom:16px">
+          <h3 style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700">💾 Saved Scripts</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="select-input" onchange="filterScripts(this.value,'tone')">
+              <option value="">All Tones</option>
+              <option value="motivation">Motivation</option>
+              <option value="business">Business</option>
+              <option value="educational">Educational</option>
+              <option value="funny">Funny</option>
+              <option value="storytelling">Story</option>
+              <option value="viral">Viral</option>
+            </select>
+            <select class="select-input" onchange="filterScripts(this.value,'platform')">
+              <option value="">All Platforms</option>
+              <option value="tiktok">TikTok</option>
+              <option value="instagram">Instagram</option>
+              <option value="youtube">YouTube</option>
+            </select>
+            <button class="btn btn-sm btn-outline" onclick="filterScripts('','fav')">⭐ Favorites</button>
+            <button class="btn btn-sm btn-outline" onclick="loadScripts()">↻ All</button>
+          </div>
+        </div>
+        <div id="scriptsList">
+          <div class="empty"><div class="icon">✍️</div><h3>No scripts yet</h3><p>Generate your first script above</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Hashtags ── -->
+    <div class="page" id="page-hashtags">
+      <div class="page-header">
+        <h1>#️⃣ Hashtag Generator</h1>
+        <p>Generate platform-optimized hashtags instantly</p>
+      </div>
+
+      <div class="gen-grid">
+        <div class="card">
+          <div class="field">
+            <label>Topic / Niche</label>
+            <input type="text" id="hashTopic" placeholder="e.g. fitness, cooking, crypto..." style="width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none"/>
+          </div>
+          <label style="font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Platform</label>
+          <div class="gen-options" id="hashPlatformOptions">
+            <button class="option-btn selected" data-val="tiktok" onclick="selectOption(this,'hashplatform')">TikTok</button>
+            <button class="option-btn" data-val="instagram" onclick="selectOption(this,'hashplatform')">Instagram</button>
+            <button class="option-btn" data-val="youtube" onclick="selectOption(this,'hashplatform')">YouTube</button>
+            <button class="option-btn" data-val="twitter" onclick="selectOption(this,'hashplatform')">Twitter</button>
+            <button class="option-btn" data-val="linkedin" onclick="selectOption(this,'hashplatform')">LinkedIn</button>
+          </div>
+          <button class="btn" onclick="generateHashtags()" style="margin-top:16px">✨ Generate Hashtags</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Result</h3><button class="btn btn-sm btn-green" onclick="copyHashtags()">📋 Copy</button></div>
+          <div class="hashtag-result" id="hashtagResult">Your hashtags will appear here...</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="card-header" style="margin-bottom:12px"><h3 style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700">Recent Hashtag Sets</h3></div>
+        <div id="hashtagHistory"><div class="empty"><div class="icon">#️⃣</div><p>No saved sets yet</p></div></div>
+      </div>
+    </div>
+
+    <!-- ── Profile ── -->
+    <div class="page" id="page-profile">
+      <div class="page-header">
+        <h1>👤 Profile</h1>
+        <p>Manage your account settings</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <h3 style="font-family:'Syne',sans-serif;margin-bottom:20px">Account Info</h3>
+          <div class="field"><label>Display Name</label><input type="text" id="profDisplay" style="width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none"/></div>
+          <div class="field"><label>Bio</label><textarea id="profBio" rows="3" style="width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;resize:vertical"></textarea></div>
+          <button class="btn" onclick="updateProfile()">Save Changes</button>
+          <div class="msg" id="profMsg"></div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-family:'Syne',sans-serif;margin-bottom:20px">Change Password</h3>
+          <div class="field"><label>Current Password</label><input type="password" id="currPass" style="width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none"/></div>
+          <div class="field"><label>New Password</label><input type="password" id="newPass" style="width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none"/></div>
+          <div class="field"><label>Confirm New Password</label><input type="password" id="confPass" style="width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none"/></div>
+          <button class="btn" onclick="changePassword()">Update Password</button>
+          <div class="msg" id="passMsg"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3 style="font-family:'Syne',sans-serif;margin-bottom:16px">Account Statistics</h3>
+        <div class="stats-grid" id="profileStats"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════
+const API = window.location.origin;
+let TOKEN = localStorage.getItem('vox_token');
+let USER  = null;
+let scriptPlatform = 'tiktok';
+let scriptTone     = 'motivation';
+let hashPlatform   = 'tiktok';
+let lastScript     = '';
+let lastHashtags   = '';
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+(async () => {
+  if (TOKEN) {
+    try {
+      const r = await apiFetch('/api/user/profile');
+      if (r.success) { USER = r.user; showApp(); }
+      else { localStorage.removeItem('vox_token'); TOKEN = null; }
+    } catch { localStorage.removeItem('vox_token'); TOKEN = null; }
+  }
+})();
+
+// ═══════════════════════════════════════════════════════
+//  API HELPER
+// ═══════════════════════════════════════════════════════
+async function apiFetch(url, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', ...(TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}) }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + url, opts);
+  return r.json();
+}
+
+async function apiUpload(url, formData, onProgress) {
+  return new Promise((res, rej) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', API + url);
+    if (TOKEN) xhr.setRequestHeader('Authorization', `Bearer ${TOKEN}`);
+    xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total * 100); };
+    xhr.onload  = () => res(JSON.parse(xhr.responseText));
+    xhr.onerror = () => rej(new Error('Upload failed'));
+    xhr.send(formData);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════
+function switchAuth(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='signup'&&i===1)));
+  document.getElementById('loginForm').style.display  = tab === 'login'  ? '' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? '' : 'none';
+}
+
+async function login() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPass').value;
+  const msg = document.getElementById('loginMsg');
+  showMsg(msg, '', '');
+  const r = await apiFetch('/api/auth/login', 'POST', { email, password });
+  if (r.success) {
+    TOKEN = r.token; USER = r.user;
+    localStorage.setItem('vox_token', TOKEN);
+    showApp();
+  } else showMsg(msg, r.error, 'error');
+}
+
+async function signup() {
+  const username = document.getElementById('signupUser').value;
+  const display_name = document.getElementById('signupDisplay').value;
+  const email    = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPass').value;
+  const msg = document.getElementById('signupMsg');
+  const r = await apiFetch('/api/auth/signup', 'POST', { username, display_name, email, password });
+  if (r.success) {
+    TOKEN = r.token; USER = r.user;
+    localStorage.setItem('vox_token', TOKEN);
+    showApp();
+  } else showMsg(msg, r.error, 'error');
+}
+
+function logout() {
+  localStorage.removeItem('vox_token');
+  TOKEN = null; USER = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+}
+
+function showApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  updateSidebar();
+  loadDashboard();
+}
+
+// ═══════════════════════════════════════════════════════
+//  SIDEBAR / NAV
+// ═══════════════════════════════════════════════════════
+function updateSidebar() {
+  if (!USER) return;
+  document.getElementById('sidebarName').textContent  = USER.display_name || USER.username;
+  document.getElementById('sidebarPlan').textContent  = USER.plan + ' plan';
+  document.getElementById('sidebarAvatar').textContent = (USER.display_name || USER.username || '?')[0].toUpperCase();
+  document.getElementById('dashName').textContent = USER.display_name || USER.username;
+}
+
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => { if (n.textContent.toLowerCase().includes(page.toLowerCase().slice(0,5))) n.classList.add('active'); });
+  closeSidebar();
+
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'videos')    loadVideos();
+  if (page === 'images')    loadImages();
+  if (page === 'audio')     loadAudio();
+  if (page === 'scripts')   loadScripts();
+  if (page === 'hashtags')  loadHashtags();
+  if (page === 'profile')   loadProfile();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════
+async function loadDashboard() {
+  const r = await apiFetch('/api/dashboard');
+  if (!r.success) return;
+  const s = r.stats;
+
+  document.getElementById('statVideos').textContent  = s.total_videos;
+  document.getElementById('statImages').textContent  = s.total_images || 0;
+  document.getElementById('statScripts').textContent = s.total_scripts;
+  document.getElementById('statAudio').textContent   = s.total_audio;
+  document.getElementById('statViews').textContent   = fmt(s.total_views);
+  document.getElementById('statStorage').textContent = s.storage_mb || 0;
+
+  // Recent videos
+  const rv = document.getElementById('recentVideos');
+  rv.innerHTML = r.recent_videos.length ? r.recent_videos.map(v => `
+    <div class="activity-item">
+      <div style="width:40px;height:28px;background:var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0">
+        ${v.thumbnail ? `<img src="${v.thumbnail}" style="width:100%;height:100%;object-fit:cover;border-radius:4px"/>` : '🎬'}
+      </div>
+      <div class="activity-text" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.title || 'Untitled'}</div>
+      <div class="activity-time">${timeAgo(v.created_at)}</div>
+    </div>
+  `).join('') : '<div class="empty"><div class="icon">🎬</div><p>No videos yet</p></div>';
+
+  // Recent scripts
+  const rs = document.getElementById('recentScripts');
+  rs.innerHTML = r.recent_scripts.length ? r.recent_scripts.map(s => `
+    <div class="activity-item">
+      <div class="activity-dot"></div>
+      <div class="activity-text" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.topic} <span style="color:var(--muted);font-size:.75rem">(${s.tone})</span></div>
+      <div class="activity-time">${timeAgo(s.created_at)}</div>
+    </div>
+  `).join('') : '<div class="empty"><div class="icon">✍️</div><p>No scripts yet</p></div>';
+
+  // Activity
+  const af = document.getElementById('activityFeed');
+  af.innerHTML = r.activity.length ? r.activity.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot"></div>
+      <div class="activity-text">${actionLabel(a.action)} ${a.details ? `<span style="color:var(--muted)">${a.details}</span>` : ''}</div>
+      <div class="activity-time">${timeAgo(a.created_at)}</div>
+    </div>
+  `).join('') : '<div class="empty"><div class="icon">⚡</div><p>No activity yet</p></div>';
+}
+
+// ═══════════════════════════════════════════════════════
+//  VIDEOS
+// ═══════════════════════════════════════════════════════
+async function uploadVideo(input) {
+  const file = input.files[0]; if (!file) return;
+  const prog = document.getElementById('videoProgress');
+  const fill = document.getElementById('videoProgressFill');
+  prog.style.display = 'block'; fill.style.width = '0%';
+
+  const fd = new FormData();
+  fd.append('video', file);
+  fd.append('title', file.name.replace(/\.[^.]+$/, ''));
+
+  try {
+    const r = await apiUpload('/api/videos/upload', fd, p => fill.style.width = p + '%');
+    prog.style.display = 'none';
+    if (r.success) { toast('Video uploaded!', 'success'); loadVideos(); }
+    else toast(r.error || 'Upload failed', 'error');
+  } catch (e) { prog.style.display = 'none'; toast('Upload failed', 'error'); }
+  input.value = '';
+}
+
+async function loadVideos(search = '') {
+  const q = search ? `?search=${encodeURIComponent(search)}` : '';
+  const r = await apiFetch('/api/videos' + q);
+  const g = document.getElementById('videosGrid');
+  if (!r.success || !r.videos.length) {
+    g.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="icon">🎬</div><h3>No videos yet</h3><p>Upload your first video above</p></div>'; return;
+  }
+  g.innerHTML = r.videos.map(v => `
+    <div class="media-item">
+      <div class="media-thumb">
+        ${v.thumbnail ? `<img src="${v.thumbnail}" alt="${v.title}"/>` : '<span style="font-size:2rem">🎬</span>'}
+      </div>
+      <div class="media-info">
+        <h4>${v.title || 'Untitled'}</h4>
+        <p>${v.duration ? fmtDur(v.duration) : ''} · ${fmt(v.views)} views · ${timeAgo(v.created_at)}</p>
+        <div class="media-actions">
+          <a href="${v.url}" target="_blank" class="btn btn-sm btn-outline" style="text-decoration:none">▶ Play</a>
+          <button class="btn btn-sm btn-red" onclick="deleteVideo('${v.id}')">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterVideos(q) { clearTimeout(window._vt); window._vt = setTimeout(() => loadVideos(q), 400); }
+
+async function deleteVideo(id) {
+  if (!confirm('Delete this video?')) return;
+  const r = await apiFetch(`/api/videos/${id}`, 'DELETE');
+  if (r.success) { toast('Video deleted', 'success'); loadVideos(); }
+  else toast(r.error, 'error');
+}
+
+// ═══════════════════════════════════════════════════════
+//  IMAGES
+// ═══════════════════════════════════════════════════════
+async function uploadImage(input) {
+  const file = input.files[0]; if (!file) return;
+  const fd = new FormData();
+  fd.append('image', file);
+  fd.append('title', file.name.replace(/\.[^.]+$/, ''));
+  try {
+    const r = await apiUpload('/api/images/upload', fd);
+    if (r.success) { toast('Image uploaded!', 'success'); loadImages(); }
+    else toast(r.error || 'Upload failed', 'error');
+  } catch { toast('Upload failed', 'error'); }
+  input.value = '';
+}
+
+async function loadImages() {
+  const r = await apiFetch('/api/images');
+  const g = document.getElementById('imagesGrid');
+  if (!r.success || !r.images.length) {
+    g.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="icon">🖼️</div><h3>No images yet</h3><p>Upload your first image above</p></div>'; return;
+  }
+  g.innerHTML = r.images.map(i => `
+    <div class="media-item">
+      <div class="media-thumb"><img src="${i.url}" alt="${i.title}" style="width:100%;height:100%;object-fit:cover"/></div>
+      <div class="media-info">
+        <h4>${i.title || 'Untitled'}</h4>
+        <p>${fmtSize(i.file_size)} · ${timeAgo(i.created_at)}</p>
+        <div class="media-actions">
+          <a href="${i.url}" target="_blank" class="btn btn-sm btn-outline" style="text-decoration:none">🔍 View</a>
+          <button class="btn btn-sm btn-red" onclick="deleteImage('${i.id}')">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deleteImage(id) {
+  if (!confirm('Delete this image?')) return;
+  const r = await apiFetch(`/api/images/${id}`, 'DELETE');
+  if (r.success) { toast('Image deleted', 'success'); loadImages(); }
+  else toast(r.error, 'error');
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════════════════
+async function uploadAudio(input) {
+  const file = input.files[0]; if (!file) return;
+  const fd = new FormData();
+  fd.append('audio', file);
+  fd.append('title', file.name.replace(/\.[^.]+$/, ''));
+  try {
+    const r = await apiUpload('/api/audio/upload', fd);
+    if (r.success) { toast('Audio uploaded!', 'success'); loadAudio(); }
+    else toast(r.error || 'Upload failed', 'error');
+  } catch { toast('Upload failed', 'error'); }
+  input.value = '';
+}
+
+async function loadAudio() {
+  const r = await apiFetch('/api/audio');
+  const el = document.getElementById('audioList');
+  if (!r.success || !r.audio.length) {
+    el.innerHTML = '<div class="empty"><div class="icon">🎵</div><h3>No audio yet</h3><p>Upload your first audio above</p></div>'; return;
+  }
+  el.innerHTML = r.audio.map(a => `
+    <div class="script-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-weight:500;margin-bottom:4px">🎵 ${a.title || 'Untitled'}</div>
+          <div style="font-size:.78rem;color:var(--muted)">${a.duration ? fmtDur(a.duration) : '—'} · ${fmtSize(a.file_size)} · ${timeAgo(a.created_at)}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <audio controls src="${a.url}" style="height:36px;max-width:200px"></audio>
+          <button class="btn btn-sm btn-red" onclick="deleteAudio('${a.id}')">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deleteAudio(id) {
+  if (!confirm('Delete this audio?')) return;
+  const r = await apiFetch(`/api/audio/${id}`, 'DELETE');
+  if (r.success) { toast('Audio deleted', 'success'); loadAudio(); }
+  else toast(r.error, 'error');
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCRIPTS
+// ═══════════════════════════════════════════════════════
+function selectOption(btn, type) {
+  const container = btn.closest('.gen-options') || btn.parentElement;
+  container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if (type === 'platform') scriptPlatform = btn.dataset.val;
+  else if (type === 'tone') scriptTone = btn.dataset.val;
+  else if (type === 'hashplatform') hashPlatform = btn.dataset.val;
+}
+
+async function generateScript() {
+  const topic = document.getElementById('scriptTopic').value.trim();
+  if (!topic) { toast('Enter a topic first!', 'error'); return; }
+
+  const btn = document.getElementById('genBtn');
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  btn.disabled = true;
+
+  const r = await apiFetch('/api/scripts/generate', 'POST', {
+    topic, platform: scriptPlatform, tone: scriptTone, title: `${topic} — ${scriptTone}`
+  });
+
+  btn.innerHTML = '✨ Generate Script';
+  btn.disabled = false;
+
+  if (r.success) {
+    lastScript = r.content;
+    document.getElementById('scriptResult').style.display = 'block';
+    document.getElementById('scriptPlaceholder').style.display = 'none';
+    document.getElementById('scriptOutput').textContent = r.content;
+    document.getElementById('hashtagOutput').textContent = r.hashtags;
+    document.getElementById('ctaOutput').textContent = r.cta;
+    document.getElementById('hooksOutput').innerHTML = r.hooks.map(h => `
+      <div class="hook-item" onclick="copyText('${h.replace(/'/g,"\\'")}')">
+        <span>${h}</span><span style="color:var(--muted);font-size:.75rem">click to copy</span>
+      </div>
+    `).join('');
+    toast('Script generated!', 'success');
+    loadScripts();
+  } else toast(r.error, 'error');
+}
+
+function copyScript() {
+  if (!lastScript) return;
+  navigator.clipboard.writeText(lastScript).then(() => toast('Script copied!', 'success'));
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => toast('Copied!', 'success'));
+}
+
+async function loadScripts(filters = {}) {
+  let q = '?';
+  if (filters.tone)     q += `tone=${filters.tone}&`;
+  if (filters.platform) q += `platform=${filters.platform}&`;
+  if (filters.fav)      q += 'favorites=true&';
+
+  const r = await apiFetch('/api/scripts' + q);
+  const el = document.getElementById('scriptsList');
+  if (!r.success || !r.scripts.length) {
+    el.innerHTML = '<div class="empty"><div class="icon">✍️</div><h3>No scripts yet</h3><p>Generate your first script above</p></div>'; return;
+  }
+  el.innerHTML = r.scripts.map(s => `
+    <div class="script-card">
+      <div class="script-meta">
+        <span class="tag tag-purple">${s.tone}</span>
+        <span class="tag tag-cyan">${s.platform}</span>
+        <span class="tag tag-amber">${s.word_count} words</span>
+        ${s.is_favorite ? '<span class="tag tag-green">⭐ Favorite</span>' : ''}
+      </div>
+      <div style="font-weight:500;margin-bottom:6px">${s.title || s.topic}</div>
+      <div class="script-content">${s.content}</div>
+      <div class="script-actions">
+        <button class="btn btn-sm btn-green" onclick="copyScriptById('${s.id}','${escJs(s.content)}')">📋 Copy</button>
+        <button class="btn btn-sm btn-outline" onclick="toggleFav('${s.id}',this)">${s.is_favorite ? '💛 Unfav' : '⭐ Fav'}</button>
+        <button class="btn btn-sm btn-red" onclick="deleteScript('${s.id}')">🗑</button>
+        <span style="font-size:.75rem;color:var(--muted);margin-left:auto">${timeAgo(s.created_at)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterScripts(val, type) {
+  const filters = {};
+  if (type === 'tone' && val)     filters.tone = val;
+  if (type === 'platform' && val) filters.platform = val;
+  if (type === 'fav')             filters.fav = true;
+  loadScripts(filters);
+}
+
+async function copyScriptById(id, content) {
+  await apiFetch(`/api/scripts/${id}/copy`, 'PATCH');
+  navigator.clipboard.writeText(content).then(() => toast('Script copied!', 'success'));
+}
+
+async function toggleFav(id, btn) {
+  const r = await apiFetch(`/api/scripts/${id}/favorite`, 'PATCH');
+  if (r.success) {
+    btn.textContent = r.is_favorite ? '💛 Unfav' : '⭐ Fav';
+    toast(r.is_favorite ? 'Added to favorites' : 'Removed from favorites', 'success');
+  }
+}
+
+async function deleteScript(id) {
+  if (!confirm('Delete this script?')) return;
+  const r = await apiFetch(`/api/scripts/${id}`, 'DELETE');
+  if (r.success) { toast('Script deleted', 'success'); loadScripts(); }
+  else toast(r.error, 'error');
+}
+
+// ═══════════════════════════════════════════════════════
+//  HASHTAGS
+// ═══════════════════════════════════════════════════════
+async function generateHashtags() {
+  const topic = document.getElementById('hashTopic').value.trim();
+  if (!topic) { toast('Enter a topic first!', 'error'); return; }
+  const r = await apiFetch('/api/hashtags/generate', 'POST', { topic, platform: hashPlatform });
+  if (r.success) {
+    lastHashtags = r.tags;
+    document.getElementById('hashtagResult').textContent = r.tags;
+    toast('Hashtags generated!', 'success');
+    loadHashtags();
+  } else toast(r.error, 'error');
+}
+
+function copyHashtags() {
+  if (!lastHashtags) return;
+  navigator.clipboard.writeText(lastHashtags).then(() => toast('Hashtags copied!', 'success'));
+}
+
+async function loadHashtags() {
+  const r = await apiFetch('/api/hashtags');
+  const el = document.getElementById('hashtagHistory');
+  if (!r.success || !r.hashtags.length) {
+    el.innerHTML = '<div class="empty"><div class="icon">#️⃣</div><p>No saved sets yet</p></div>'; return;
+  }
+  el.innerHTML = r.hashtags.slice(0, 10).map(h => `
+    <div class="script-card" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <span class="tag tag-cyan" style="margin-right:6px">${h.platform}</span>
+          <strong>${h.name}</strong>
+        </div>
+        <button class="btn btn-sm btn-green" onclick="copyText('${escJs(h.tags)}')">📋 Copy</button>
+      </div>
+      <p style="font-size:.8rem;color:var(--accent2);margin-top:8px;line-height:1.8">${h.tags}</p>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════════════════
+async function loadProfile() {
+  const r = await apiFetch('/api/user/profile');
+  if (!r.success) return;
+  const u = r.user;
+  document.getElementById('profDisplay').value = u.display_name || '';
+  document.getElementById('profBio').value     = u.bio || '';
+
+  const ps = document.getElementById('profileStats');
+  const s  = u.stats || {};
+  ps.innerHTML = `
+    <div class="stat-card purple"><div class="stat-icon">🎬</div><div class="stat-val">${s.videos||0}</div><div class="stat-label">Videos</div></div>
+    <div class="stat-card cyan"><div class="stat-icon">🖼️</div><div class="stat-val">${s.images||0}</div><div class="stat-label">Images</div></div>
+    <div class="stat-card amber"><div class="stat-icon">✍️</div><div class="stat-val">${s.scripts||0}</div><div class="stat-label">Scripts</div></div>
+    <div class="stat-card green"><div class="stat-icon">🎵</div><div class="stat-val">${s.audio||0}</div><div class="stat-label">Audio</div></div>
+    <div class="stat-card purple"><div class="stat-icon">👁️</div><div class="stat-val">${fmt(s.total_views||0)}</div><div class="stat-label">Total Views</div></div>
+  `;
+}
+
+async function updateProfile() {
+  const display_name = document.getElementById('profDisplay').value;
+  const bio          = document.getElementById('profBio').value;
+  const msg = document.getElementById('profMsg');
+  const r = await apiFetch('/api/user/profile', 'PATCH', { display_name, bio });
+  if (r.success) {
+    showMsg(msg, 'Profile updated!', 'success');
+    USER.display_name = display_name;
+    updateSidebar();
+    toast('Profile saved!', 'success');
+  } else showMsg(msg, r.error, 'error');
+}
+
+async function changePassword() {
+  const current_password = document.getElementById('currPass').value;
+  const new_password     = document.getElementById('newPass').value;
+  const conf             = document.getElementById('confPass').value;
+  const msg = document.getElementById('passMsg');
+  if (new_password !== conf) { showMsg(msg, 'Passwords do not match', 'error'); return; }
+  const r = await apiFetch('/api/user/change-password', 'POST', { current_password, new_password });
+  if (r.success) { showMsg(msg, 'Password changed!', 'success'); toast('Password updated!', 'success'); }
+  else showMsg(msg, r.error, 'error');
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function showMsg(el, msg, type) {
+  el.textContent = msg;
+  el.className = `msg ${type}`;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function fmt(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'K' : n; }
+function fmtDur(s) { return s ? `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}` : '—'; }
+function fmtSize(b) { return b ? (b > 1048576 ? (b/1048576).toFixed(1)+'MB' : (b/1024).toFixed(0)+'KB') : '—'; }
+function escJs(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n'); }
+
+function timeAgo(dt) {
+  const diff = (Date.now() - new Date(dt)) / 1000;
+  if (diff < 60)   return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400)return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function actionLabel(a) {
+  const map = { signup:'Joined VoxStudio', login:'Signed in', upload_video:'Uploaded video', upload_image:'Uploaded image', generate_script:'Generated script', delete_video:'Deleted video' };
+  return map[a] || a;
+}
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('loginEmail') === document.activeElement ||
+        document.getElementById('loginPass')  === document.activeElement) login();
+    if (document.getElementById('scriptTopic') === document.activeElement) generateScript();
+    if (document.getElementById('hashTopic')   === document.activeElement) generateHashtags();
+  }
+});
+</script>
+</body>
+</html>
